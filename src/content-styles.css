@@ -1,0 +1,104 @@
+.toggl {
+    position: relative;
+    margin-right: 10px;
+}
+
+.toggl:before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 6px 8px 6px;
+    border-color: transparent transparent #fff transparent;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -6px;
+    z-index: 1;
+    margin-top: 4px;
+}
+
+.toggl-popup {
+    background-color: #fff;
+    padding: 15px 20px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    top: 100%;
+    right: 0;
+    position: absolute;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+    margin-top: 10px;
+    display: none;
+}
+
+.toggl.is-active .toggl-popup {
+    display: block;
+}
+
+.toggl-settings {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+.toggl-settings > :not(:first-child) {
+    margin-left: 5px;
+}
+
+.toggl-popup-input.toggl-popup-input {
+    width: 150px;
+}
+
+.is-error {
+    border-color: red !important;
+}
+
+.toggl-secion-title {
+    font-size: 120%;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.toggl-label {
+    margin-bottom: 10px;
+    display: block;
+}
+
+.toggl-popup-section + .toggl-popup-section {
+    margin-top: 20px;
+}
+
+.toggl-entries-footer {
+    display: flex;
+}
+
+.toggl-entries-footer > :not(:first-child) {
+    margin-left: 5px;
+}
+
+.toggl-item {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.toggl-item > :not(:first-child) {
+    margin-left: 5px;
+}
+
+.toggle-item-name.toggle-item-name {
+    width: 200px;
+}
+
+.toggle-item-cost.toggle-item-cost,
+.toggle-item-hours.toggle-item-hours {
+    width: 70px;
+}
+
+.toggl-entries {
+    margin-bottom: 10px;
+}
+
+.toggl-entries:empty {
+    content: 'There is no entry to add';
+}

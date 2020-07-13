@@ -1,0 +1,43 @@
+{
+    "name": "Getfive Toggl integration",
+    "version": "1.0.0",
+    "manifest_version": 2,
+    "background": {
+        "scripts": [
+            "background.js",
+            "hot-reload.js"
+        ],
+        "persistent": false
+    },
+    "permissions": [
+        "activeTab",
+        "management",
+        "storage",
+        "*://*.toggl.com/*",
+        "*://toggl.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://invoices.getfives.co/"
+            ],
+            "run_at": "document_idle",
+            "css": [
+                "content-styles.css"
+            ],
+            "js": [
+                "content-script.js"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        "templates/*"
+    ],
+    "externally_connectable": {
+        "matches": [
+            "*://*.toggl.com/*",
+            "*://toggl.com/*"
+        ]
+    },
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

@@ -1,0 +1,18 @@
+<div class="toggl-item">
+  <input class="toggle-item-name input" aria-label="Item name" placeholder="Name" name="xrm_invoices_basebundle_item[name]" required value="{name}">
+  <input class="toggle-item-hours input" aria-label="Item hours" placeholder="Hours" type="number" step="0.01" name="xrm_invoices_basebundle_item[cost]" value="{hours}">
+  <input class="toggle-item-cost input" aria-label="Item cost" placeholder="Cost" type="number" step="0.01" name="xrm_invoices_basebundle_item[cost]" required value="{cost}">
+  <div class="select">
+    <select aria-label="Item producer" name="xrm_invoices_basebundle_item[producer]" required>
+      {producers}
+    </select>
+  </div>
+  <div class="select">
+    <select aria-label="Item type" name="xrm_invoices_basebundle_item[type]" required>
+      {types}
+    </select>
+  </div>
+  <input type="hidden" name="xrm_invoices_basebundle_item[saasuId]" value="XH">
+  <input type="hidden" name="xrm_invoices_basebundle_item[finished]" value="1">
+  <input type="hidden" name="xrm_invoices_basebundle_item[_token]" value="{token}">
+</div>

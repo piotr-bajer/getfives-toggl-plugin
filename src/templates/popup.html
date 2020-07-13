@@ -1,0 +1,33 @@
+<div class="toggl">
+  <button class="toggl-trigger button is-primary" type="button">Import from Toggl</button>
+  <div class="toggl-popup">
+    <ul class="toggl-popup-sections">
+      <li class="toggl-popup-section">
+        <h2 class="toggl-secion-title">Settings</h2>
+        <div class="toggl-settings">
+          <div>
+            <label class="toggl-label" for="toggl-popup-key">Toggl Api Key</label>
+            <input class="toggl-popup-input toggl-popup-input--key input" placeholder="Enter Toggl Api Key" id="toggl-popup-key">
+          </div>
+          <div>
+            <label class="toggl-label" for="toggl-hourly-rate">Hourly Rate</label>
+            <input class="toggl-popup-input toggl-popup-input--rate input" placeholder="Enter Hourly Rate" id="toggl-hourly-rate">
+          </div>
+          <div>
+            <button class="toggl-save-settings button is-secondary" type="button">Save Settings</button>
+          </div>
+        </div>
+      </li>
+      <li class="toggl-popup-section">
+        <h2 class="toggl-secion-title">Entries</h2>
+        <div class="toggl-entries"></div>
+        <div class="toggl-entries-footer">
+          <button class="toggl-download button is-secondary" type="button" disabled>Download Entries</button>
+          <button class="toggl-add button is-secondary" type="button">Add Entry</button>
+          <button class="toggl-clear button is-secondary" type="button">Clear Entries</button>
+          <button class="toggl-save button is-secondary" type="button" disabled>Save Entries</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
