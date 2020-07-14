@@ -21,6 +21,7 @@ module.exports = {
   entry: {
     'background': './src/background.js',
     'getfives': './src/getfives.js',
+    'ifirma': './src/ifirma.js',
   },
   module: {
     rules: [
