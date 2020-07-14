@@ -1,5 +1,3 @@
-const SessionData = null;
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.command === 'fetch') {
     fetch(request.url, request.settings)

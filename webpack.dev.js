@@ -5,7 +5,7 @@ module.exports = {
   watch: true,
   entry: {
     'background': './src/background.js',
-    'content-script': './src/content-script.js',
+    'getfives': './src/getfives.js',
     'hot-reload': './src/hot-reload.js',
   },
   module: {
@@ -19,7 +19,13 @@ module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        {from: 'src'},
+        {
+          from: '**/*',
+          context: 'src/',
+          globOptions: {
+            ignore: ['**/templates/*'],
+          },
+        },
       ],
     }),
   ],

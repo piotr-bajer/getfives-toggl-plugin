@@ -5,6 +5,21 @@ let Settings = {};
 const HOUR_IN_MILISECONDS = 60 * 60 * 1000;
 const GETFIVES_CREATE_LINK = 'https://invoices.getfives.co/items/create';
 
+function getCurrentDate() {
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+
+  const date = new Date();
+
+  return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+/**
+ * @param {string} endpoint
+ * @param {{}} settings
+ * @return {Promise<object>}
+ */
 function getTogglResponse(endpoint, settings = {}) {
   const defaultSettings = {
     method: 'GET',
@@ -23,6 +38,11 @@ function getTogglResponse(endpoint, settings = {}) {
   }, resolve)).catch((error) => console.error(error));
 }
 
+/**
+ * @param {string|number} key
+ * @param {{}} settings
+ * @return {Promise<object>}
+ */
 function saveSettings(key, settings) {
   return new Promise((resolve) => {
     const data = {};
@@ -33,6 +53,10 @@ function saveSettings(key, settings) {
   });
 }
 
+/**
+ * @param {string} key
+ * @return {Promise<object>}
+ */
 function getSettings(key) {
   return new Promise((resolve) => {
     chrome.storage.local.get(key, function(settings) {
@@ -41,14 +65,10 @@ function getSettings(key) {
   });
 }
 
-function getSessionData() {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage({command: 'sessionData'}, (response) => {
-      resolve(response);
-    });
-  });
-}
-
+/**
+ * @param {{}} data
+ * @return {string}
+ */
 function parseEntry(data) {
   const keys = Object.keys(data);
   let template = itemHTML;
@@ -62,38 +82,52 @@ function parseEntry(data) {
   return template;
 }
 
+/**
+ * @param {any} container
+ * @param {{}} data
+ */
 function addEntry(container, data) {
   const html = parseEntry({...Settings, ...data});
 
   container.insertAdjacentHTML('afterbegin', html);
 }
 
+/**
+ * @return {int}
+ */
 async function getWorkspace() {
-  // if (!Settings.workspace) {
-  await getTogglResponse('api/v8/workspaces').then((data) => {
-    data.forEach((workspace) => {
-      if (workspace.name.toLowerCase().indexOf('xfive') > -1) {
-        Settings.workspace = workspace.id;
-        saveSettings('settings', Settings);
-      }
+  if (!Settings.workspace) {
+    await getTogglResponse('api/v8/workspaces').then((data) => {
+      data.forEach((workspace) => {
+        if (workspace.name.toLowerCase().indexOf('xfive') > -1) {
+          Settings.workspace = workspace.id;
+          saveSettings('settings', Settings);
+        }
+      });
     });
-  });
-  // }
+  }
 
   return Settings.workspace;
 }
 
+/**
+ * @return {int}
+ */
 async function getUserId() {
-  // if (!Settings.userId) {
-  await getTogglResponse('api/v8/me').then((data) => {
-    Settings.userId = data.data.id;
-    saveSettings('settings', Settings);
-  });
-  // }
+  if (!Settings.userId) {
+    await getTogglResponse('api/v8/me').then((data) => {
+      Settings.userId = data.data.id;
+      saveSettings('settings', Settings);
+    });
+  }
 
   return Settings.userId;
 }
 
+/**
+ * @param {number} entry
+ * @return {number}
+ */
 function parseTimeEntry(entry) {
   return Math.round(entry * 100) * 0.01;
 }
@@ -115,6 +149,8 @@ async function init(entryPoint) {
   const downloadEntriesBtn = toggl.querySelector('.toggl-download');
   const addEntryBtn = toggl.querySelector('.toggl-add');
   const clearEntriesBtn = toggl.querySelector('.toggl-clear');
+  const copyBtn = toggl.querySelector('.toggl-copy');
+  const copyMessage = toggl.querySelector('.toggl-copy-message');
 
   keyInput.addEventListener('input', () => {
     downloadEntriesBtn.disabled = keyInput.value.length < 1;
@@ -219,7 +255,6 @@ async function init(entryPoint) {
   saveEntriesBtn.addEventListener('click', (event) => {
     [].forEach.call(entriesContainer.children, (child) => {
       const data = {};
-
       let hasError = false;
 
       [].forEach.call(child.querySelectorAll('[name]'), (input) => {
@@ -247,14 +282,78 @@ async function init(entryPoint) {
     });
   });
 
+  copyBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+
+    const date = getCurrentDate();
+    const link = document.evaluate(`//a[text()[contains(.,'${date}')]]`, document.querySelector('table tbody'), null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
+    copyMessage.textContent = '';
+
+    if (link !== null) {
+      fetch('https://invoices.getfives.co' + link.href)
+          .then((t) => t.text())
+          .then((html) => {
+
+          });
+    } else {
+      copyMessage.textContent = 'Cannot find link for ' + date;
+    }
+  });
+
   const entriesObserver = new MutationObserver((mutationsList, observer) => {
     saveEntriesBtn.disabled = entriesContainer.children.length < 1;
   });
   entriesObserver.observe(entriesContainer, {childList: true});
 }
 
-const entryPoint = document.querySelector('[href="/items/create"]');
+if (location.href === 'https://invoices.getfives.co/') {
+  const entryPoint = document.querySelector('[href="/items/create"]');
 
-if (entryPoint !== null) {
-  init(entryPoint);
+  if (entryPoint !== null) {
+    init(entryPoint);
+  }
+}
+
+if (location.href.match(/https:\/\/invoices\.getfives\.co\/[0-9]+\/?/)) {
+  const pdfButton = document.querySelector('[href$="pdf"]');
+
+  if (pdfButton !== null) {
+    pdfButton.parentNode.insertAdjacentHTML('beforebegin',
+        '<li class="level-item">' +
+        '<button class="toggl-copy button is-primary" type="button">' +
+        'Copy Current Entries for IFIRMA' +
+        '</button>' +
+        '</li>',
+    );
+
+    const copyBtn = pdfButton.parentNode.parentElement
+        .querySelector('.toggl-copy');
+
+    copyBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      const rows = document.querySelectorAll('table tbody tr');
+      const entries = [];
+
+      [].forEach.call(rows, (row) => {
+        entries.push({
+          // eslint-disable-next-line max-len
+          name: `${row.children[0].textContent.trim()} (${row.children[5].textContent.trim()})`,
+          cost: row.children[3].textContent.replace('USD', '').trim()
+              .replace(',', ''),
+        });
+      });
+
+      saveSettings('currentEntries', entries);
+
+      const text = copyBtn.textContent;
+
+      copyBtn.textContent = 'Copied!';
+
+      setTimeout(() => {
+        copyBtn.textContent = text;
+      }, 1000);
+    });
+  }
 }

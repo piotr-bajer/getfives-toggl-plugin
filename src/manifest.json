@@ -14,30 +14,37 @@
         "management",
         "storage",
         "*://*.toggl.com/*",
-        "*://toggl.com/*"
+        "*://toggl.com/*",
+        "*://*.ifirma/*",
+        "*://ifirma/*"
     ],
     "content_scripts": [
         {
             "matches": [
-                "https://invoices.getfives.co/"
+                "https://invoices.getfives.co/*"
             ],
             "run_at": "document_idle",
             "css": [
-                "content-styles.css"
+                "getfives.css"
             ],
             "js": [
-                "content-script.js"
+                "getfives.js"
+            ]
+        }, {
+            "matches": [
+                "https://www.ifirma.pl/app/wo/*"
+            ],
+            "run_at": "document_idle",
+            "css": [
+                "ifirma.css"
+            ],
+            "js": [
+                "ifirma.js"
             ]
         }
     ],
     "web_accessible_resources": [
         "templates/*"
     ],
-    "externally_connectable": {
-        "matches": [
-            "*://*.toggl.com/*",
-            "*://toggl.com/*"
-        ]
-    },
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
