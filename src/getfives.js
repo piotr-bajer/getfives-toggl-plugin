@@ -5,16 +5,6 @@ let Settings = {};
 const HOUR_IN_MILISECONDS = 60 * 60 * 1000;
 const GETFIVES_CREATE_LINK = 'https://invoices.getfives.co/items/create';
 
-function getCurrentDate() {
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
-  ];
-
-  const date = new Date();
-
-  return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-}
-
 /**
  * @param {string} endpoint
  * @param {{}} settings
@@ -66,6 +56,19 @@ function getSettings(key) {
 }
 
 /**
+ * @param {string} content
+ * @return {string}
+ */
+function escapeAttribute(content) {
+  return content.toString()
+      .replace(/"/g, '&amp;')
+      .replace(/'/g, '&apos;')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+}
+
+/**
  * @param {{}} data
  * @return {string}
  */
@@ -74,7 +77,9 @@ function parseEntry(data) {
   let template = itemHTML;
 
   keys.forEach((key) => {
-    template = template.replace(`{${key}}`, data[key]);
+    if (data[key] !== undefined) {
+      template = template.replace(`{${key}}`, data[key]);
+    }
   });
 
   template = template.replace(/{[a-z]+}/ig, '');
@@ -87,7 +92,16 @@ function parseEntry(data) {
  * @param {{}} data
  */
 function addEntry(container, data) {
-  const html = parseEntry({...Settings, ...data});
+  const escapeKeys = ['name', 'cost', 'hours'];
+  const parsedData = {...data};
+
+  escapeKeys.forEach((key) => {
+    if (parsedData[key] !== undefined) {
+      parsedData[key] = escapeAttribute(parsedData[key]);
+    }
+  });
+
+  const html = parseEntry({...Settings, ...parsedData});
 
   container.insertAdjacentHTML('afterbegin', html);
 }
@@ -149,8 +163,6 @@ async function init(entryPoint) {
   const downloadEntriesBtn = toggl.querySelector('.toggl-download');
   const addEntryBtn = toggl.querySelector('.toggl-add');
   const clearEntriesBtn = toggl.querySelector('.toggl-clear');
-  const copyBtn = toggl.querySelector('.toggl-copy');
-  const copyMessage = toggl.querySelector('.toggl-copy-message');
 
   keyInput.addEventListener('input', () => {
     downloadEntriesBtn.disabled = keyInput.value.length < 1;
@@ -280,25 +292,6 @@ async function init(entryPoint) {
         }).catch((error) => console.error(error));
       }
     });
-  });
-
-  copyBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-
-    const date = getCurrentDate();
-    const link = document.evaluate(`//a[text()[contains(.,'${date}')]]`, document.querySelector('table tbody'), null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
-    copyMessage.textContent = '';
-
-    if (link !== null) {
-      fetch('https://invoices.getfives.co' + link.href)
-          .then((t) => t.text())
-          .then((html) => {
-
-          });
-    } else {
-      copyMessage.textContent = 'Cannot find link for ' + date;
-    }
   });
 
   const entriesObserver = new MutationObserver((mutationsList, observer) => {
