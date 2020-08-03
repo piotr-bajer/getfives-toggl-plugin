@@ -241,10 +241,10 @@ async function init(entryPoint) {
         .then((response) => {
           const entries = [];
           response.data.forEach((data) => {
-            if (data.title.project.toLowerCase().indexOf('Internal:') > -1) {
-              data.title.project.items.forEach((item) => {
+            if (data.title.project.toLowerCase().indexOf('internal:') > -1) {
+              data.items.forEach((item) => {
                 entries.push({
-                  name: item.title.time_entry,
+                  name: 'Estimation: ' + item.title.time_entry,
                   hours: parseTimeEntry(item.time / HOUR_IN_MILISECONDS),
                   // eslint-disable-next-line max-len
                   cost: parseTimeEntry(item.time / HOUR_IN_MILISECONDS * Settings.rate),
