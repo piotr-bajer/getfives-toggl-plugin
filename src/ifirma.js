@@ -24,6 +24,10 @@ function prepareElements(entries) {
     return false;
   }
 
+  const getTableBody = () => {
+    return document.querySelector('#pozycjeTabId tbody');
+  };
+
   footer.insertAdjacentHTML('beforeend',
       '<button class="btn btn-secondary" type="button" id="getfives-import">' +
     '<i class="fa fa-plus"></i> ' +
@@ -33,34 +37,18 @@ function prepareElements(entries) {
   footer.lastChild.addEventListener('click', (event) => {
     event.preventDefault();
 
-    for (let i = 0; i < entries.length; i++) {
+    let tableBody = getTableBody();
+    const destinationRows = Math.max(entries.length,
+        tableBody.children.length / 2);
+    const rowsToCreate = entries.length - tableBody.children.length / 2 + 1;
+
+    for (let i = 0; i < rowsToCreate; i++) {
       addRowButton.click();
     }
 
-    setTimeout(() => {
-      let tableBody = document.querySelector('#pozycjeTabId tbody');
-      const startIndex = tableBody.children.length - entries.length * 2;
-
-      for (let i = 0; i < entries.length; i++) {
-        const polishRow = tableBody.children[startIndex + i * 2];
-        const foreignRow = tableBody.children[startIndex + i * 2 + 1];
-        const entry = entries[i];
-
-        const namePl = polishRow.querySelector('._ac_nazwa');
-        const nameForeign = foreignRow.querySelector('._ac_nazwaObca');
-
-        namePl.value = entry.name;
-        nameForeign.value = entry.name;
-        polishRow.querySelector('._jednostka').value = 'usł.';
-        foreignRow.querySelector('._jednostkaObca').value = 'serv.';
-        polishRow.querySelector('._ilosc').value = 1;
-        polishRow.querySelector('._cenaNetto').value = entry.cost;
-        namePl.dispatchEvent(new Event('blur'));
-        nameForeign.dispatchEvent(new Event('blur'));
-      }
-
+    const deleteRows = () => {
       const deleteRow = () => {
-        tableBody = document.querySelector('#pozycjeTabId tbody');
+        tableBody = getTableBody();
         let deleteButton = null;
 
         [].forEach.call(tableBody.children, (row) => {
@@ -80,7 +68,67 @@ function prepareElements(entries) {
       setTimeout(() => {
         deleteRow();
       }, 1000);
-    }, 100 * entries.length);
+    };
+
+    const addEntries = () => {
+      let index = 0;
+
+      const fillData = () => {
+        tableBody = getTableBody();
+
+        const polishRow = tableBody.children[index * 2];
+        const foreignRow = tableBody.children[index * 2 + 1];
+        const entry = entries[index];
+        const namePl = polishRow.querySelector('._ac_nazwa');
+        const nameForeign = foreignRow.querySelector('._ac_nazwaObca');
+
+        namePl.value = entry.name;
+        nameForeign.value = entry.name;
+        polishRow.querySelector('._jednostka').value = 'usł.';
+        foreignRow.querySelector('._jednostkaObca').value = 'serv.';
+        polishRow.querySelector('._ilosc').value = 1;
+        polishRow.querySelector('._cenaNetto').value = entry.cost;
+        namePl.dispatchEvent(new Event('blur'));
+        nameForeign.dispatchEvent(new Event('blur'));
+      };
+
+      const nextRow = () => {
+        fillData(index);
+        index += 1;
+
+        if (index < entries.length) {
+          return setTimeout(nextRow, 200);
+        }
+
+        tableBody = getTableBody();
+        const limit = tableBody.children.length / 2 - entries.length;
+
+        for (let i = 0; i < limit; i++) {
+          const row = tableBody.children[entries.length + i];
+          const name = row.querySelector('._ac_nazwa');
+
+          if (name !== null) {
+            name.value = '';
+          }
+
+          setTimeout(deleteRows, 500);
+        }
+      };
+
+      nextRow();
+    };
+
+    const checkRows = () => {
+      tableBody = getTableBody();
+
+      if (tableBody.children.length / 2 >= destinationRows) {
+        addEntries();
+      } else {
+        setTimeout(checkRows, 200);
+      }
+    };
+
+    setTimeout(checkRows, 100 * Math.min(rowsToCreate, 1));
   });
 
   return true;
