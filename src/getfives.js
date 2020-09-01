@@ -221,7 +221,19 @@ async function init(entryPoint) {
     event.preventDefault();
 
     const date = new Date();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+
+    if (date.getDate() < 2) {
+      const currentMonth = date.getMonth();
+      if (currentMonth < 1) {
+        date.setFullYear(date.getFullYear() - 1);
+        date.setMonth(11);
+      } else {
+        date.setMonth(date.getMonth() - 1);
+      }
+    }
+
+    const month = parseInt((date.getMonth() + 1).toString()
+        .padStart(2, '0'), 10);
     const year = date.getFullYear();
     const day = new Date(year, month, 0).getDate();
     const workspaceId = await getWorkspace();
@@ -236,6 +248,8 @@ async function init(entryPoint) {
       grouping: 'projects',
       subgrouping: 'time_entries',
     });
+
+    console.log(params.toString());
 
     getTogglResponse('reports/api/v2/summary?' + params.toString())
         .then((response) => {
