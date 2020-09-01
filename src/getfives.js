@@ -249,8 +249,6 @@ async function init(entryPoint) {
       subgrouping: 'time_entries',
     });
 
-    console.log(params.toString());
-
     getTogglResponse('reports/api/v2/summary?' + params.toString())
         .then((response) => {
           const entries = [];
