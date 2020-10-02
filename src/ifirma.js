@@ -70,6 +70,13 @@ function prepareElements(entries) {
       }, 1000);
     };
 
+    const setValue = (input, value, afterChange = null) => {
+      input.value = value;
+      if (afterChange !== null) {
+        afterChange();
+      }
+    };
+
     const addEntries = () => {
       let index = 0;
 
@@ -81,15 +88,20 @@ function prepareElements(entries) {
         const entry = entries[index];
         const namePl = polishRow.querySelector('._ac_nazwa');
         const nameForeign = foreignRow.querySelector('._ac_nazwaObca');
+        const unitPl = polishRow.querySelector('._jednostka');
+        const unitForeign = foreignRow.querySelector('._jednostkaObca');
+        const quantity = polishRow.querySelector('._ilosc');
+        const priceNetto = polishRow.querySelector('._cenaNetto');
 
-        namePl.value = entry.name;
-        nameForeign.value = entry.name;
-        polishRow.querySelector('._jednostka').value = 'usł.';
-        foreignRow.querySelector('._jednostkaObca').value = 'serv.';
-        polishRow.querySelector('._ilosc').value = 1;
-        polishRow.querySelector('._cenaNetto').value = entry.cost;
+        setValue(namePl, entry.name);
         namePl.dispatchEvent(new Event('blur'));
+        setValue(nameForeign, entry.name);
         nameForeign.dispatchEvent(new Event('blur'));
+        setValue(unitPl, 'usł.');
+        setValue(unitForeign, 'serv.');
+        setValue(quantity, 1);
+        setValue(priceNetto, entry.cost.toString().replace('.', ','));
+        priceNetto.dispatchEvent(new Event('change'));
       };
 
       const nextRow = () => {
@@ -104,14 +116,14 @@ function prepareElements(entries) {
         const limit = tableBody.children.length / 2 - entries.length;
 
         for (let i = 0; i < limit; i++) {
-          const row = tableBody.children[entries.length + i];
+          const row = tableBody.children[entries.length * 2 + i * 2];
           const name = row.querySelector('._ac_nazwa');
 
           if (name !== null) {
             name.value = '';
           }
 
-          setTimeout(deleteRows, 500);
+          setTimeout(deleteRows, 1000);
         }
       };
 
@@ -128,7 +140,7 @@ function prepareElements(entries) {
       }
     };
 
-    setTimeout(checkRows, 100 * Math.min(rowsToCreate, 1));
+    setTimeout(checkRows, 500 + 500 * Math.min(rowsToCreate, 1));
   });
 
   return true;
