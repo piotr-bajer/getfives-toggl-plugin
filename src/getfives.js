@@ -177,9 +177,9 @@ async function init(entryPoint) {
       isClicked = true;
 
       getSettings('settings').then((settings) => {
-        Settings = settings;
-        keyInput.value = settings.togglKey ? settings.togglKey : '';
-        rateInput.value = settings.rate ? settings.rate : '';
+        Settings = settings || {};
+        keyInput.value = Settings.togglKey ? Settings.togglKey : '';
+        rateInput.value = Settings.rate ? Settings.rate : '';
         keyInput.dispatchEvent(new Event('input'));
       });
 
